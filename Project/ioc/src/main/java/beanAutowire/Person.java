@@ -1,19 +1,13 @@
-package beanAttribute;
+package beanAutowire;
 
+/**
+ * @author micro soft
+ * @version : Person, v 0.1 2019/7/1 18:33 micro soft Exp$
+ */
 public class Person {
     private String name;
-    private int age;
+    private Address address;
     private Car car;
-
-    public Person(){
-
-    };
-
-    public Person(String name, int age, Car car) {
-        this.name = name;
-        this.age = age;
-        this.car = car;
-    }
 
     public String getName() {
         return name;
@@ -23,12 +17,12 @@ public class Person {
         this.name = name;
     }
 
-    public int getAge() {
-        return age;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     public Car getCar() {
@@ -43,7 +37,7 @@ public class Person {
     public String toString() {
         return "Person{" +
                 "name='" + name + '\'' +
-                ", age=" + age +
+                ", address=" + address +
                 ", car=" + car +
                 '}';
     }
