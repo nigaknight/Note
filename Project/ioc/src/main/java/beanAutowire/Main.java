@@ -20,6 +20,6 @@ public class Main {
         Person person2=(Person) applicationContext.getBean("person2");
         System.out.println(person2);
 
-        applicationContext.close();
+
     }
 }
