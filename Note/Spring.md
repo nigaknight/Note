@@ -4,21 +4,13 @@
 
 ### Spring是什么
 
-**（1）Spring是一个开源框架**
+1、Spring是一个开源框架
 
-**（2）Spring的目的是简化企业级应用开发**
+2、Spring的目的是简化企业级应用开发
 
-**（3）Spring是一个IOC和AOP框架**
+3、Spring是一个IOC和AOP框架
 
-**（4）Spring的特征**
-
-轻量级
-
-依赖注入
-
-面向切面编程
-
-容器
+4、Spring的特征：轻量级、依赖注入、面向切面编程、容器
 
 框架：Spring 实现了使用简单的组件配置组合成一个复杂的应用. 在 Spring 中可以使用 XML 和 Java 注解组合这些对象
 
@@ -30,23 +22,23 @@
 
 ### Spring核心组件介绍
 
-spring总共有十几个组件，但是真正核心的组件只有几个。Spring框架中的核心组件只有三个：[**Core**](http://developer.51cto.com/art/200906/129814.htm)、Context和Beans。它们构建起了整个Spring的骨骼架构。没有它们就不可能有[**AOP**](http://developer.51cto.com/art/200906/130204.htm)、Web等上层的特性功能。下面也将主要从这三个组件入手分析Spring。
+1、spring总共有十几个组件，但是真正核心的组件只有几个。Spring框架中的核心组件只有三个：Core、Context和Beans。它们构建起了整个Spring的骨骼架构。没有它们就不可能有AOP、Web等上层的特性功能。下面也将主要从这三个组件入手分析Spring。
 
-Bean在Spring中作用就像Object对OOP的意义一样，没有对象的概念就像没有面向对象编程，Spring中没有Bean也就没有Spring存在的意义。Spring解决了一个非常关键的问题他可以让 你把对象之间的依赖关系转而用配置文件来管理，也就是他的依赖注入机制。而这个注入关系在一个叫Ioc容器中管理，那Ioc容器中有又是什么就是被Bean包裹的对象。Spring正是通过把对象包装在 Bean中而达到对这些对象管理以及一些列额外操作的目的。
+2、Bean在Spring中作用就像Object对OOP的意义一样，没有对象的概念就像没有面向对象编程，Spring中没有Bean也就没有Spring存在的意义。Spring解决了一个非常关键的问题他可以让 你把对象之间的依赖关系转而用配置文件来管理，也就是他的依赖注入机制。而这个注入关系在一个叫Ioc容器中管理，那Ioc容器中有又是什么就是被Bean包裹的对象。Spring正是通过把对象包装在 Bean中而达到对这些对象管理以及一些列额外操作的目的。
 
-如果将Bean比作一场演出中的演员的话，那Context就是这场演出的舞台背景，而Core应该就是演出的道具了。
+3、如果将Bean比作一场演出中的演员的话，那Context就是这场演出的舞台背景，而Core应该就是演出的道具了。
 
-我们知道Bean包装的是Object，而Object必然有数据，如何给这些数据提供生存环境就是Context要解决的问题，对Context来说他就是要发现每个Bean之间的关系，为它们建立这种关系并且要维护好 这种关系。所以Context就是一个Bean关系的集合，这个关系集合又叫Ioc容器，一旦建立起这个Ioc容器后Spring就可以为你工作了。那Core组件又有什么用武之地呢？其实Core就是发现、建立和维护每 个Bean之间的关系所需要的一些列的工具，从这个角度看来，Core这个组件叫Util更能让你理解。
+4、我们知道Bean包装的是Object，而Object必然有数据，如何给这些数据提供生存环境就是Context要解决的问题，对Context来说他就是要发现每个Bean之间的关系，为它们建立这种关系并且要维护好 这种关系。所以Context就是一个Bean关系的集合，这个关系集合又叫Ioc容器，一旦建立起这个Ioc容器后Spring就可以为你工作了。那Core组件又有什么用武之地呢？其实Core就是发现、建立和维护每 个Bean之间的关系所需要的一些列的工具，从这个角度看来，Core这个组件叫Util更能让你理解。
 
 ### Spring模块
 
 核心容器
 
-Beans,Core,Context,SpEL
+1、Beans,Core,Context,SpEL
 
-Date Access/Itegration
+2、Date Access/Itegration
 
-Web
+3、Web
 
 ### 安装Spring Tool SUITE
 
@@ -54,14 +46,14 @@ eclipse需要安装Spring工具插件才能建立Spring工程；
 
 Spring的安装有以下两个方法：
 
-（1）在[Spring官网](https://spring.io/tools3/sts/all/)下载eclipse对应版本的Spring安装包，注意安装包必须以updatesite结尾。
+1、在[Spring官网](https://spring.io/tools3/sts/all/)下载eclipse对应版本的Spring安装包，注意安装包必须以updatesite结尾。
 
 >对应eclipse 4.9.0的链接地址是 https://download.springsource.com/release/TOOLS/update/3.9.8.RELEASE/e4.9/springsource-tool-suite-3.9.8.RELEASE-e4.9.0-updatesite.zip
 ，如果需要其他版本，可以将其中的数字改成相应版本。
 
 >遇到的问题：我所需要的4.5.0版本找不到对应的安装包链接地址。
 
-（2）使用网络链接地址
+2、使用网络链接地址
 
 >使用这个链接 http://dist.springsource.com/release/TOOLS/update/e4.X/ 可以插入你的 Eclipse 的版本，再匹配其中的“x”，例如我的 Eclipse Neon.2 Release (4.6.2) ，安装时使用 http://dist.springsource.com/release/TOOLS/update/e4.6/ 
 
@@ -77,9 +69,8 @@ Spring核心包：beans,context,core,experssion （来自Spring框架的lib里�
 
 Spring日志包：commons-logging
 
-> 使用maven导入Spring开发环境：
+> 使用maven导入Spring开发环境：导入spring核心组件context的依赖即可（它会自动添加其他所需spring依赖）。
 >
-> 主要导入spring核心组件context的依赖即可（它会自动添加其他所需spring依赖）。
 
 ```xml
 <!--pom.xml-->
@@ -92,7 +83,7 @@ Spring日志包：commons-logging
 
 ### 建立Spring项目
 
-（1）创建一个HelloWorld项目，输出"Hello world "+"your name"。
+1、创建一个HelloWorld项目，输出"Hello world "+"your name"。
 
 
 ```java
@@ -112,7 +103,7 @@ public class HelloWorld {
 
 创建对象以及为属性赋值交给Spring解决。
 
-（2）创建一个Spring项目，(src) New->Spring Bean Configuration File，创建文件applicationContext.xml，在这个文件下配置bean。
+2、创建一个Spring项目，(src) New->Spring Bean Configuration File，创建文件applicationContext.xml，在这个文件下配置bean。
 
 >配置bean的xml文件可以取任意的名字，不一定要是applicationContext.xml；applicationContext是创建IOC容器的类名。
 
@@ -139,7 +130,7 @@ class：要配置的类名（使用反射方式创建对象）
 
 property：name表示要赋值的属性，value表示要赋的值
 
-（3）创建Spring的IOC容器对象
+3、创建Spring的IOC容器对象
 
 ```java
 public class Main {
@@ -158,17 +149,17 @@ public class Main {
 
 > 如果想要最后关闭IOC容器，需要将applicationContext一开始就设置为（或者最后类型转换为）ApplicaitonContext的子类，就可以调用close方法了。  
 
-A 创建Spring的IOC容器
+（1）创建Spring的IOC容器
 
 >applicationContext：Spring的IOC容器接口
 >
 >ClassPathXmlApplicationContext：上述接口的实现类
 
-B 从容器中获取Bean
+（2）从容器中获取Bean
 
 >getBean()方法：从IOC容器中获取Bean实例
 
-C 调用Hello方法
+（3）调用Hello方法
 
 分析：创建IOC容器的时候，会调用类构造器，对bean初始化，并对属性进行赋值。
 
@@ -180,11 +171,11 @@ C 调用Hello方法
 
 对象创建方式的演变
 
-（1）分离接口和实现
+1、分离接口和实现
 
-（2）采用工厂设计模式
+2、采用工厂设计模式
 
-（3）采用控制反转
+3、采用控制反转
 
 #### IOC
 
@@ -206,21 +197,15 @@ Spring 提供了 IOC 容器的两种实现方式
 
 #### ApplicationContext 的主要实现类 
 
-1) ClassPathXmlApplicationContext： 对应类路径下的 XML 格式的配置文件
+1、ClassPathXmlApplicationContext： 对应类路径下的 XML 格式的配置文件
 
-2) FileSystemXmlApplicationContext： 对应文件系统中的 XML 格式的配置文件
+2、FileSystemXmlApplicationContext： 对应文件系统中的 XML 格式的配置文件
 
-3) 在初始化时就创建单例的 bean， 也可以通过配置的方式指定创建的 Bean 是多实例的。 
+3、在初始化时就创建单例的 bean， 也可以通过配置的方式指定创建的 Bean 是多实例的。 
 
-#### ConfigurableApplicationContext 
+4、ConfigurableApplicationContext ：是 ApplicationContext 的子接口， 包含一些扩展方法 refresh()和 close()让 ApplicationContext 具有启动、 关闭和刷新上下文的能力。 
 
-是 ApplicationContext 的子接口， 包含一些扩展方法 
-
-refresh()和 close()让 ApplicationContext 具有启动、 关闭和刷新上下文的能力。 
-
-#### WebApplicationContext 
-
-专门为 WEB 应用而准备的， 它允许从相对于 WEB 根目录的路径中完成初始化工作 
+5、WebApplicationContext ：专门为 WEB 应用而准备的， 它允许从相对于 WEB 根目录的路径中完成初始化工作 
 
 ### 通过类型获取 bean 
 
@@ -246,7 +231,7 @@ HelloWorld helloWorld = cxt.getBean(“helloWorld”,HelloWorld. class)
 
 #### 依赖注入的方式
 
-**属性注入**
+##### 属性注入
 
 •属性注入即通过 setter 方法注入Bean 的属性值或依赖的对象
 
@@ -266,7 +251,7 @@ HelloWorld helloWorld = cxt.getBean(“helloWorld”,HelloWorld. class)
 </beans>
 ```
 
-**构造器注入**
+##### 构造器注入
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -304,7 +289,9 @@ HelloWorld helloWorld = cxt.getBean(“helloWorld”,HelloWorld. class)
 </beans>
 ```
 
-**工厂方法注入（很少使用，不推荐）**
+##### 工厂方法注入
+
+很少使用，不推荐
 
 #### p命名空间
 
@@ -323,7 +310,7 @@ Person{name='dzq', age=27, cars=[Car{brand='Audi', corp='Shanghai', price=300000
 
 #### 可以使用的值
 
-**字面值**
+##### 字面值
 
 1) 可以使用字符串表示的值， 可以通过 value 属性或 value 子节点的方式指定
 
@@ -331,7 +318,7 @@ Person{name='dzq', age=27, cars=[Car{brand='Audi', corp='Shanghai', price=300000
 
 3) 若字面值中包含特殊字符， 可以使用<![CDATA[]]>把字面值包裹起来 
 
-**null值**
+##### null值
 
 赋值null，一般用不到，因为不赋值其实就是赋值null
 
@@ -351,7 +338,7 @@ Person{name='dzq', age=27, cars=[Car{brand='Audi', corp='Shanghai', price=300000
 Person{name='dzq', age=27, car=null}
 ```
 
-**给 bean 的级联属性赋值** 
+##### 给 bean 的级联属性赋值 
 
 ```xml
     <bean id="person4" class="beanAttribute.Person">
@@ -371,7 +358,7 @@ Person{name='dzq', age=27, car=Car{brand='benchi', corp='Beijing', price=400000.
 
 注意：属性需要先初始化才可以给级联属性赋值，否则会有异常，比如这个例子中，给car.maxSpeed赋值时如果car本身没有初始化，则会有异常。
 
-**外部已声明的 bean** 
+##### 外部已声明的 bean 
 
 ```xml
     <!-- ref引用外部已经声明的bean，建立bean之间的依赖关系-->
@@ -382,7 +369,7 @@ Person{name='dzq', age=27, car=Car{brand='benchi', corp='Beijing', price=400000.
     </bean>
 ```
 
-**内部 bean** 
+##### 内部 bean 
 
 当 bean 实例仅仅给一个特定的属性使用时， 可以将其声明为内部 bean。 内部 bean 声明直接包含在<property>或<constructor-arg>元素里， 不需要设置任何 id或 name 属性 。
 
@@ -545,11 +532,11 @@ Spring 中有两种类型的 bean， 一种是普通 bean， 另一种是工厂 
 
 #### 配置信息的继承 
 
-**背景** 
+##### 背景 
 
 bean之间的配置存在重复
 
-**配置信息的继承 **
+##### 配置信息的继承 
 
 Spring 允许继承 bean 的配置， 被继承的 bean 称为父 bean。 继承这个父 bean 的 bean称为子 bean
 
@@ -570,7 +557,7 @@ Address{city='Nanjing', street='Taipingbeilu'}
 Address{city='Nanjing', street='beijingdonglu'}
 ```
 
-**补充说明 **
+##### 补充说明 
 
 父 bean 可以作为配置模板， 也可以作为 bean 实例。 若只想把父 bean 作为模板， 可以设置<bean>的 abstract 属性为 true， 这样 Spring 将不会实例化这个 bean
 
@@ -899,15 +886,15 @@ Exception in thread "main" org.springframework.beans.factory.NoSuchBeanDefinitio
 
 #### 组件装配
 
-**需求**
+##### 需求
 
 Controller 组件中往往需要用到 Service 组件的实例， Service 组件中往往需要用到Repository 组件的实例。 Spring 可以通过注解的方式帮我们实现属性的装配。
 
-**实现依据**
+##### 实现依据
 
 在指定要扫描的包时， <context:component-scan> 元素会自动注册一个 bean 的后置处理器：AutowiredAnnotationBeanPostProcessor 的实例。 该后置处理器可以自动装配标记了@Autowired、 @Resource 或@Inject 注解的属性。
 
-**@Autowired 注解**
+##### @Autowired 
 
 1、根据类型实现自动装配。
 
@@ -1022,11 +1009,11 @@ UserRepositoty save ...
 null
 ```
 
-**@Resource**
+##### @Resource
 
 @Resource 注解要求提供一个 bean 名称的属性， 若该属性为空， 则自动采用标注处的变量或方法名作为 bean 的名称。
 
-**@Inject**
+##### @Inject
 
 @Inject 和@Autowired 注解一样也是按类型注入匹配的 bean， 但没有 reqired 属性。 
 
@@ -1036,7 +1023,7 @@ null
 
 #### 提出问题 
 
-**情景： 数学计算器** 
+##### 情景： 数学计算器 
 
 1、要求 
 
@@ -1058,11 +1045,11 @@ null
 
 #### 动态代理 
 
-**动态代理的原理** 
+##### 动态代理的原理 
 
 代理设计模式的原理： 使用一个代理将对象包装起来， 然后用该代理对象取代原始对象。 任何对原始对象的调用都要通过代理。 代理对象决定是否以及何时将方法调用转到原始对象上。 
 
-**动态代理的方式** 
+##### 动态代理的方式 
 
 （1）基于接口实现动态代理： JDK 动态代理 
 
@@ -1070,13 +1057,13 @@ null
 
 #### 数学计算器的改进 
 
-**日志处理器** 
+##### 日志处理器 
 
-**验证处理器** 
+##### 验证处理器 
 
-**测试代码** 
+##### 测试代码 
 
-**保存生成的动态代理类**
+##### 保存生成的动态代理类
 
 ### AOP 概述  
 
@@ -1098,27 +1085,27 @@ null
 
 #### AOP 术语 
 
-**横切关注点** 
+##### 横切关注点 
 
 从每个方法中抽取出来的同一类非核心业务。 
 
-**切面(Aspect)** 
+##### 切面(Aspect) 
 
 封装横切关注点信息的类， 每个关注点体现为一个通知方法。 
 
-**通知(Advice)** 
+##### 通知(Advice) 
 
 切面必须要完成的各个具体工作 。
 
-**目标(Target)** 
+##### 目标(Target) 
 
 被通知的对象 
 
-**代理(Proxy)** 
+##### 代理(Proxy) 
 
 向目标对象应用通知之后创建的代理对象 
 
-**连接点(Joinpoint)** 
+##### 连接点(Joinpoint) 
 
 横切关注点在程序代码中的具体体现， 对应程序执行的某个特定位置。 例如： 类某个方法调用前、 调用后、 方法捕获到异常后等。 
 
@@ -1128,19 +1115,19 @@ null
 
 纵坐标：每个方法中的各个关注点，如方法开始、捕获异常、方法结束；
 
-**切入点(pointcut)** 
+##### 切入点(pointcut) 
 
 定位连接点的方式。 每个类的方法中都包含多个连接点， 所以连接点是类中客观存在的事物。 如果把连接点看作数据库中的记录， 那么切入点就是查询条件——AOP 可以通过切入点定位到特定的连接点。 切点通过 org.springframework.aop.Pointcut 接口进行描述， 它使用类和方法作为连接点的查询条件。 
 
 #### AspectJ 
 
-**简介** 
+##### 简介 
 
 AspectJ： Java 社区里最完整最流行的 AOP 框架。 
 
 在 Spring2.0 以上版本中， 可以使用基于 AspectJ 注解或基于 XML 配置的 AOP。 
 
-**在 Spring 中启用 AspectJ 注解支持** 
+##### 在 Spring 中启用 AspectJ 注解支持 
 
 1、导入 JAR 包 （可以使用maven）
 
@@ -1150,7 +1137,7 @@ AspectJ： Java 社区里最完整最流行的 AOP 框架。
 
 当 Spring IOC 容器侦测到 bean 配置文件中的<aop:aspectj-autoproxy>元素时， 会自动为与 AspectJ 切面匹配的 bean 创建代理 
 
-**用 AspectJ 注解声明切面** 
+##### 用 AspectJ 注解声明切面 
 
 1、要在 Spring 中声明 AspectJ 切面， 只需要在 IOC 容器中将切面声明为 bean 实例。 
 
@@ -1176,11 +1163,11 @@ AspectJ： Java 社区里最完整最流行的 AOP 框架。
 
 #### 切入点表达式 
 
-**作用** 
+##### 作用 
 
 通过表达式的方式定位一个或多个具体的连接点。 
 
-**语法细节** 
+##### 语法细节 
 
 1、切入点表达式的语法格式 
 
@@ -1192,19 +1179,19 @@ execution([权限修饰符] [返回值类型] [简单类名/全类名] [方法�
 
 3、在 AspectJ 中， 切入点表达式可以通过 “&&”、 “||”、 “!”等操作符结合起来。 
 
-**切入点表达式应用到实际的切面类中** 
+##### 切入点表达式应用到实际的切面类中 
 
 #### 当前连接点细节 
 
-**概述** 
+##### 概述 
 
 切入点表达式通常都会是从宏观上定位一组方法，和具体某个通知的注解结合起来就能够确定对应的连接点。 那么就一个具体的连接点而言， 我们可能会关心这个连接点的一些具体信息， 例如： 当前连接点所在方法的方法名、 当前传入的参数值等等。 这些信息都封装在JoinPoint 接口的实例对象中。 
 
-**JoinPoint** 
+##### JoinPoint 
 
 #### 通知 
 
-**概述** 
+##### 概述 
 
 1、在具体的连接点上要执行的操作。 
 
@@ -1212,19 +1199,19 @@ execution([权限修饰符] [返回值类型] [简单类名/全类名] [方法�
 
 3、通知所使用的注解的值往往是切入点表达式。 
 
-**前置通知** 
+##### 前置通知 
 
 前置通知： 在方法执行之前执行的通知 ，使用@Before 注解 。
 
-**后置通知** 
+##### 后置通知 
 
 后置通知： 后置通知是在连接点完成之后执行的， 即连接点返回结果或者抛出异常的时候 ，使用@After 注解 
 
-**返回通知** 
+##### 返回通知 
 
-**异常通知** 
+##### 异常通知 
 
-**环绕通知** 
+##### 环绕通知 
 
 #### 重用切入点定义 
 
