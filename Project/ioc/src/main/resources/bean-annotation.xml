@@ -6,5 +6,8 @@
             http://www.springframework.org/schema/beans/spring-beans.xsd
             http://www.springframework.org/schema/context
             http://www.springframework.org/schema/context/spring-context-4.3.xsd">
-<context:component-scan base-package="beans"></context:component-scan>
+
+<!--通过注解配置bean-->
+<context:component-scan base-package="beanAnnotation">
+</context:component-scan>
 </beans>

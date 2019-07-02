@@ -1,7 +1,6 @@
-package beans.annotation;
+package beanAnnotation.component;
 
 import org.springframework.stereotype.Component;
 
-@Component
 public class TestObject {
 }

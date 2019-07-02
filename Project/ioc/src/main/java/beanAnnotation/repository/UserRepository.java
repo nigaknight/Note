@@ -1,4 +1,4 @@
-package beans.repository;
+package beanAnnotation.repository;
 
 public interface UserRepository {
     public void save();
