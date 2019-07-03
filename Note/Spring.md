@@ -668,15 +668,61 @@ postProcessAfterInitialization(Object, String)
 
 #### 直接配置 
 
+使用c3p0定义数据库连接
+
+```xml
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="user" value="root"></property>
+        <property name="password" value="12345678"></property>
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql:///test"></property>
+    </bean>
+```
+
+将数据源的连接打印出来
+
+```java
+ApplicationContext applicationContext=new ClassPathXmlApplicationContext("bean-properties.xml");
+ComboPooledDataSource dataSource = (ComboPooledDataSource) applicationContext.getBean("dataSource");
+System.out.println(dataSource.getConnection());
+```
+
+输出
+
+```
+com.mchange.v2.c3p0.impl.NewProxyConnection@2ddc9a9f
+```
+
 #### 使用外部的属性文件 
 
+> 使用外部属性文件可以将配置文件单独维护；
+
 创建 properties 属性文件 
+
+```properties
+username=root
+password=12345678
+driverClass=com.mysql.jdbc.Driver
+jdbcUrl=jdbc:mysql:///test
+```
 
 引入 context 名称空间 
 
 指定 properties 属性文件的位置 
 
 从 properties 属性文件中引入属性值 
+
+```xml
+    <context:property-placeholder location="classpath:db.properties"/>
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="user" value="${user}"></property>
+        <property name="password" value="${password}"></property>
+        <property name="driverClass" value="${driverClass}"></property>
+        <property name="jdbcUrl" value="${jdbcUrl}"></property>
+    </bean>
+```
+
+最后的输出和直接配置的结果相同，但是数据库的属性可以单独维护了。
 
 ### 自动装配 
 
@@ -736,32 +782,87 @@ Spring Expression Language， Spring 表达式语言， 简称 SpEL。 支持运
 
 SpEL 使用#{…}作为定界符， 所有在大框号中的字符都将被认为是 SpEL 表达式。 
 
-#### 使用字面量 
+##### 使用字面量 
 
-1) 整数： <property name="count" value="#{5}"/>
-2) 小数： <property name="frequency" value="#{89.7}"/>
-3) 科学计数法： <property name="capacity" value="#{1e4}"/>
-4) String 类型的字面量可以使用单引号或者双引号作为字符串的定界符号
+1、整数： <property name="count" value="#{5}"/>
+2、小数： <property name="frequency" value="#{89.7}"/>
+3、科学计数法： <property name="capacity" value="#{1e4}"/>
+4、String 类型的字面量可以使用单引号或者双引号作为字符串的定界符号
 <property name="name" value="#{'Chuck'}"/>
 <property name="name" value='#{"Chuck"}'/>
-5) Boolean： <property name="enabled" value="#{false}"/> 
+5、Boolean： <property name="enabled" value="#{false}"/> 
 
-#### 引用其他 bean 
+```xml
+    <bean id="address" class="beanSpel.Address">
+        <property name="city" value="#{'Beijing'}"></property>
+        <property name="street" value="HuiLongGuan"></property>
+    </bean>
+```
 
-#### 引用其他 bean 的属性值作为自己某个属性的值 
+输出Address对象
 
-#### 调用非静态方法 
+```
+测试用spel为属性赋一个字面值
+Address{city='Beijing', street='HuiLongGuan'}
+```
 
-#### 调用静态方法 
+仅仅是使用字面量的话，使用SpEL的意义不大；
 
-#### 运算符 
+##### 引用其他 bean 
 
-1) 算术运算符： +、 -、 *、 /、 %、 ^
-2) 字符串连接： +
-3) 比较运算符： <、 >、 ==、 <=、 >=、 lt、 gt、 eq、 le、 ge
-4) 逻辑运算符： and, or, not, |
-5) 三目运算符： 判断条件?判断结果为 true 时的取值:判断结果为 false 时的取值
-6) 正则表达式： matches 
+使用spel可以引用其他bean或者其他bean的属性
+
+```xml
+    <bean id="person" class="beanSpel.Person">
+        <property name="name" value="dzq"></property>
+        <!--使用spel来引用其他的bean-->
+        <property name="car" value="#{car}"></property>
+        <!--使用spel来引用其他的bean的属性-->
+        <property name="city" value="#{address.city}"></property>
+        <!--在spel中使用运算符-->
+        <property name="info" value="#{car.price>300000?'金领':'白领'}"></property>
+    </bean>
+```
+
+输出Person对象
+
+```
+使用spel引用其他的bean、bean的属性；在spel中使用运算符
+Person{name='dzq', city='Beijing', car=Car{brand='baoma', price=300000.0, tyrePerimeter=251.32741228718345}, info='白领'}
+```
+
+##### 调用方法
+
+这里使用了Math包里面的pi来表示轮胎的周长
+
+```xml
+<bean id="car" class="beanSpel.Car">
+    <property name="brand" value="baoma"></property>
+    <property name="price" value="300000"></property>
+    <property name="tyrePerimeter" value="#{T(java.lang.Math).PI*80}"></property>
+</bean>
+```
+
+输出Car对象
+
+```
+使用spel调用静态方法
+Car{brand='baoma', price=300000.0, tyrePerimeter=251.32741228718345}
+```
+
+##### 运算符 
+
+1、算术运算符： +、 -、 *、 /、 %、 ^
+
+2、字符串连接： +
+
+3、 比较运算符： <、 >、 ==、 <=、 >=、 lt、 gt、 eq、 le、 ge
+
+4、逻辑运算符： and, or, not, |
+
+5、三目运算符： 判断条件?判断结果为 true 时的取值:判断结果为 false 时的取值
+
+6、正则表达式： matches 
 
 ### 通过注解配置Bean
 
