@@ -629,38 +629,125 @@ false
 
 ### bean 的生命周期 
 
-（1）Spring IOC 容器可以管理 bean 的生命周期， Spring 允许在 bean 生命周期内特定的时间点执行指定的任务。 
+1、Spring IOC 容器可以管理 bean 的生命周期， Spring 允许在 bean 生命周期内特定的时间点执行指定的任务。 
 
-（2）Spring IOC 容器对 bean 的生命周期进行管理的过程：
+2、Spring IOC 容器对 bean 的生命周期进行管理的过程：
 
-① 通过构造器或工厂方法创建 bean 实例
-② 为 bean 的属性设置值和对其他 bean 的引用
-③ 调用 bean 的初始化方法
-④ bean 可以使用了
-⑤ 当容器关闭时， 调用 bean 的销毁方法 
+（1）通过构造器或工厂方法创建 bean 实例
+（2）为 bean 的属性设置值和对其他 bean 的引用
+（3）调用 bean 的初始化方法
+（4） bean 可以使用了
+（5）当容器关闭时， 调用 bean 的销毁方法 
 
-（3）在配置 bean 时， 通过 init-method 和 destroy-method 属性为 bean 指定初始化和销毁方法 。
+3、在配置 bean 时， 通过 init-method 和 destroy-method 属性为 bean 指定初始化和销毁方法 。
 
-（4）bean 的后置处理器 
+Car类
 
-① bean 后置处理器允许在调用初始化方法前后对 bean 进行额外的处理
-② bean 后置处理器对 IOC 容器里的所有 bean 实例逐一处理， 而非单一实例。 其典型
-应用是： 检查 bean 属性的正确性或根据特定的标准更改 bean 的属性。
-③ bean 后置处理器时需要实现接口：
-org.springframework.beans.factory.config.BeanPostProcessor。 在初始化方法被调用前
-后， Spring 将把每个 bean 实例分别传递给上述接口的以下两个方法：
+```java
+public class Car {
+    public Car(){
+        System.out.println("Car's Constructor...");
+    }
+
+    private String brand;
+
+    public void setBrand(String brand){
+        System.out.println("setBrand...");
+        this.brand=brand;
+    }
+
+    public void init(){
+        System.out.println("init...");
+    }
+
+    public void destroy(){
+        System.out.println("destroy...");
+    }
+}
+```
+
+bean配置
+
+```xml
+    <bean id="car" class="beanCycle.Car" init-method="init" destroy-method="destroy">
+        <property name="brand" value="Audi"></property>
+    </bean>
+```
+
+打印Car对象
+
+```java
+ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("bean-cycle.xml");
+Car car=(Car) ctx.getBean("car");
+System.out.println(car);
+```
+
+输出
+
+```java
+Car's Constructor... //调用构造函数初始化，创建bean实例
+setBrand...  // 为bean的属性设置值
+init...  // 调用bean的初始化方法
+beanCycle.Car@38c5cc4c //bean可以用了
+destroy... //调用bean的销毁方法
+```
+
+4、bean 的后置处理器 
+
+（1） bean 后置处理器允许在调用初始化方法前后对 bean 进行额外的处理
+
+（2） bean 后置处理器对 IOC 容器里的所有 bean 实例逐一处理， 而非单一实例。 其典型应用是： 检查 bean 属性的正确性或根据特定的标准更改 bean 的属性。
+
+（3）bean 后置处理器时需要实现接口：org.springframework.beans.factory.config.BeanPostProcessor。 在初始化方法被调用前后， Spring 将把每个 bean 实例分别传递给上述接口的以下两个方法：
+
+```java
 postProcessBeforeInitialization(Object, String)
 postProcessAfterInitialization(Object, String) 
+```
 
-（5）添加 bean 后置处理器后 bean 的生命周期 
+实现BeanPostProcessor接口的方法
 
-①通过构造器或工厂方法创建 bean 实例
-②为 bean 的属性设置值和对其他 bean 的引用
-③将 bean 实例传递给 bean 后置处理器的 postProcessBeforeInitialization()方法
-④调用 bean 的初始化方法
-⑤将 bean 实例传递给 bean 后置处理器的 postProcessAfterInitialization()方法
-⑥bean 可以使用了 
-⑦当容器关闭时调用 bean 的销毁方法 
+```java
+public class MyBeanPostProcessor implements BeanPostProcessor {
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("postProcessBeforeInitialization:"+bean+","+beanName);
+        return bean;
+    }
+
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println("postProcessAfterInitialization:"+bean+","+beanName);
+        return bean;
+    }
+}
+```
+
+配置实现BeanPostProcessor接口的类的bean
+
+```xml
+<bean class="beanCycle.MyBeanPostProcessor"></bean>
+```
+
+输出（在bean的可用期前后分别执行后处理方法）
+
+```
+Car's Constructor...
+setBrand...
+postProcessBeforeInitialization:beanCycle.Car@402e37bc,car
+init...
+postProcessAfterInitialization:beanCycle.Car@402e37bc,car
+beanCycle.Car@402e37bc
+destroy...
+```
+
+5、添加 bean 后置处理器后 bean 的生命周期 
+
+（1）通过构造器或工厂方法创建 bean 实例
+（2）为 bean 的属性设置值和对其他 bean 的引用
+（3）将 bean 实例传递给 bean 后置处理器的 postProcessBeforeInitialization()方法
+（4）调用 bean 的初始化方法
+（5）将 bean 实例传递给 bean 后置处理器的 postProcessAfterInitialization()方法
+（6）bean 可以使用了 
+（7）当容器关闭时调用 bean 的销毁方法 
 
 ### 引用外部属性文件 
 
