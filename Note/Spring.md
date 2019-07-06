@@ -1589,7 +1589,7 @@ result:12
 
 ##### 切入点(pointcut) 
 
-定位连接点的方式。 每个类的方法中都包含多个连接点， 所以连接点是类中客观存在的事物。 如果把连接点看作数据库中的记录， 那么切入点就是查询条件——AOP 可以通过切入点定位到特定的连接点。 切点通过 org.springframework.aop.Pointcut 接口进行描述， 它使用类和方法作为连接点的查询条件。 
+定位连接点的方式。 每个类的方法中都包含多个连接点， 所以连接点是类中客观存在的事物。 **如果把连接点看作数据库中的记录， 那么切入点就是查询条件**——AOP 可以通过切入点定位到特定的连接点。 切点通过 org.springframework.aop.Pointcut 接口进行描述， 它使用类和方法作为连接点的查询条件。 
 
 #### AspectJ 
 
@@ -1630,6 +1630,37 @@ AspectJ： Java 社区里最完整最流行的 AOP 框架。
 （4）@AfterThrowing： 异常通知， 在方法抛出异常之后执行 
 
 （5）@Around： 环绕通知， 围绕着方法执行 
+
+使用aop给数学计算器添加日志的步骤：
+
+1、使用maven导入aop要用的包：spring-aop，spring-context，aspectjweaver
+
+2、在配置文件中加入 `<aop:aspectj-autoproxy></aop:aspectj-autoproxy>`的配置
+
+```xml
+    <context:component-scan base-package="aopOverview.calculator_aop"></context:component-scan>
+
+    <!--使AspectJ注解起作用，自动为匹配的类生成代理对象-->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+```
+
+3、把横切关注点的代码抽象到切面的类中：切面首先是一个IOC中的bean，即加入@Component注解；切面还需要加入@Aspect注解；
+
+4、在类中声明各种通知：声明一个方法；在方法前加入@Before等注解，并添加切入的方法；
+
+```java
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(public int aopOverview.calculator_aop.ArithmeticCalculator.*(int,int))")
+    public void beforeMethod(JoinPoint joinPoint) {
+        String methodName = joinPoint.getSignature().getName();
+        List<Object> args = Arrays.asList(joinPoint.getArgs());
+        System.out.println("The method "+methodName+" begins with "+args);
+    }
+}
+```
 
 ### AOP 细节 
 
