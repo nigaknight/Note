@@ -636,6 +636,21 @@ public class CarFactoryBean implements FactoryBean {
     </bean>
 ```
 
+> 通过使用FactoryBean，我们可以得到不同类型的对象实例。这也就是我们在AOP中通过设置class为ProxyFactoryBean可以返回不同类型的业务对象的原理。在实际应用中若能灵活使用FactoryBean，则可以给应用程序增加很多的魔幻功能。
+
+> FactoryBean 通常是用来创建比较复杂的bean，一般的bean 直接用xml配置即可，但如果一个bean的创建过程中涉及到很多其他的bean 和复杂的逻辑，用xml配置比较困难，这时可以考虑用FactoryBean。
+
+> 很多开源项目在集成Spring 时都使用到FactoryBean，比如 MyBatis3提供 mybatis-spring项目中的 `org.mybatis.spring.SqlSessionFactoryBean`
+
+```xml
+    <!-- spring和MyBatis整合，不需要mybatis的配置映射文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 自动扫描mapping.xml文件 -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+    </bean>
+```
+
 ### bean 的高级配置 
 
 #### 配置信息的继承 
@@ -1312,6 +1327,55 @@ null
 ##### @Inject
 
 @Inject 和@Autowired 注解一样也是按类型注入匹配的 bean， 但没有 reqired 属性。 
+
+### 泛型依赖注入
+
+对于带有泛型的基类，它们的子类会继承基类之间的依赖关系；
+
+下面是两个有依赖关系的基类BaseRepository和BaseService
+
+```java
+public class BaseRepository <T>{
+
+}
+```
+
+```java
+public class BaseService <T> {
+    @Autowired
+    BaseRepository<T> baseRepository;
+
+    public void add(){
+        System.out.println("add...");
+        System.out.println(baseRepository);
+    }
+}
+```
+
+下面是它们的子类
+
+```java
+@Service
+public class UserService extends BaseService<User> {
+
+}
+```
+
+```java
+@Repository
+public class UserRepository extends BaseRepository<User> {
+
+}
+```
+
+调用UserService的对象的add方法，输出如下
+
+```
+add...
+beanGenericDi.UserRepository@702657cc
+```
+
+最后打印出来的是UserRepository，说明依赖关系被继承。
 
 ## AOP
 
