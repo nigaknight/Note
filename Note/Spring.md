@@ -293,6 +293,79 @@ HelloWorld helloWorld = cxt.getBean(“helloWorld”,HelloWorld. class)
 
 很少使用，不推荐
 
+1、静态工厂方法注入
+
+静态工厂方法注入不需要创建静态类的对象
+
+静态工厂
+
+```java
+public class StaticCarFactory {
+    private static Map<String,Car> cars=new HashMap<String,Car>();
+
+    static {
+        cars.put("Audi",new Car("Audi",300000.00));
+        cars.put("Ford",new Car("Ford",400000.00));
+    }
+
+    public static Car getCar(String brand){
+        return cars.get(brand);
+    }
+}
+```
+
+使用静态工厂方法注入bean
+
+```xml
+    <bean id="car" class="beanFactory.StaticCarFactory" factory-method="getCar">
+        <constructor-arg value="Audi"></constructor-arg>
+    </bean>
+```
+
+输出Car对象
+
+```
+通过静态工程方法获取bean
+Car{brand='Audi', price=300000.0}
+```
+
+2、实例工厂方法注入
+
+实例工厂
+
+```java
+public class InstanceCarFactory {
+    private Map<String,Car> cars=null;
+
+    public InstanceCarFactory(){
+        cars=new HashMap<String, Car>();
+        cars.put("Audi",new Car("Audi",300000.00));
+        cars.put("Ford",new Car("Ford",400000.00));
+    }
+
+    public Car getCar(String brand){
+        return cars.get(brand);
+    }
+}
+```
+
+使用实例工厂方法注入bean
+
+```xml
+    <bean id="carFactory" class="beanFactory.InstanceCarFactory"></bean>
+
+    <bean id="car2" factory-bean="carFactory" factory-method="getCar">
+        <constructor-arg value="Ford"></constructor-arg>
+    </bean>
+```
+
+输出Car对象
+
+```
+通过实例工厂方法获取bean
+Car{brand='Ford', price=400000.0}
+```
+
 #### p命名空间
 
 为了简化 XML 文件的配置， 越来越多的 XML 文件采用属性而非子元素配置信息。Spring从 2.5 版本开始引入了一个新的 p 命名空间，可以通过<bean>元素属性的方式配置 Bean的属性。使用 p 命名空间后， 基于 XML 的配置方式将进一步简化 。
@@ -527,6 +600,41 @@ Person{name='dzq', age=27, cars=[Car{brand='Audi', corp='Shanghai', price=300000
 Spring 中有两种类型的 bean， 一种是普通 bean， 另一种是工厂 bean， 即 FactoryBean。工厂 bean 跟普通 bean 不同， 其返回的对象不是指定类的一个实例， 其返回的是该工厂 bean 的 getObject 方法所返回的对象。
 
 工厂 bean 必须实现 org.springframework.beans.factory.FactoryBean 接口。 
+
+实现FactoryBean接口
+
+```java
+public class CarFactoryBean implements FactoryBean {
+    private String brand;
+	
+    public void setBrand(String brand){
+        this.brand=brand;
+    }
+	
+    // 最重要的方法，最后该工厂bean返回的就是getObject方法返回的对象
+    public Object getObject() throws Exception {
+        return new Car(brand,500000);
+    }
+	
+    // 获取bean的类型
+    public Class<?> getObjectType() {
+        return Car.class;
+    }
+	
+    // 获取bean是否单例
+    public boolean isSingleton() {
+        return true;
+    }
+}
+```
+
+注入bean，注入的是工厂bean，但是返回的是getObject方法返回的对象
+
+```xml
+    <bean id="car" class="beanFactoryBean.CarFactoryBean">
+        <property name="brand" value="BMW"></property>
+    </bean>
+```
 
 ### bean 的高级配置 
 
