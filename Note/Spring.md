@@ -1397,6 +1397,49 @@ beanGenericDi.UserRepository@702657cc
 
 直接在功能函数里面打印日志；
 
+计算器类
+
+```java
+public class ArithmeticCalculatorImpl implements ArithmeticCalculator {
+
+    public int add(int i, int j) {
+        System.out.println("The method add begins with["+i+","+j+"]");
+        int result=i+j;
+        System.out.println("The method add ends with "+result);
+        return result;
+    }
+
+    public int sub(int i, int j) {
+        System.out.println("The method sub begins with["+i+","+j+"]");
+        int result=i-j;
+        System.out.println("The method sub ends with "+result);
+        return result;
+    }
+
+    public int mul(int i, int j) {
+        System.out.println("The method mul begins with["+i+","+j+"]");
+        int result=i*j;
+        System.out.println("The method mul ends with "+result);
+        return result;
+    }
+
+    public int div(int i, int j) {
+        System.out.println("The method div begins with["+i+","+j+"]");
+        int result=i/j;
+        System.out.println("The method div ends with "+result);
+        return result;
+    }
+}
+```
+
+调用add方法输出
+
+```
+The method add begins with[3,5]
+The method add ends with 8
+result:8
+```
+
 3、问题 ：
 
 （1）代码混乱： 越来越多的非业务需求(日志和验证等)加入后， 原有的业务方法急剧膨胀。 每个方法在处理核心逻辑的同时还必须兼顾其他多个关注点。 
@@ -1409,21 +1452,90 @@ beanGenericDi.UserRepository@702657cc
 
 代理设计模式的原理： 使用一个代理将对象包装起来， 然后用该代理对象取代原始对象。 任何对原始对象的调用都要通过代理。 代理对象决定是否以及何时将方法调用转到原始对象上。 
 
+动态代理类
+
+```java
+public class ArithmeticCalculatorLoggingProxy {
+
+    // 要代理的对象
+    private ArithmeticCalculator target=new ArithmeticCalculatorImpl();
+
+    public ArithmeticCalculatorLoggingProxy(ArithmeticCalculator target){
+        this.target=target;
+    }
+
+    public ArithmeticCalculator getLoggingProxy(){
+        ArithmeticCalculator proxy=null;
+
+        // 代理对象由哪一个类加载器负责加载
+        ClassLoader loader=target.getClass().getClassLoader();
+
+        // 代理对象的类型，即其中有哪些方法
+        Class[] intefaces=new Class[]{ArithmeticCalculator.class};
+
+        // 当调用代理对象其中的方法时，该执行的代码
+        InvocationHandler h=new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                System.out.println("invoke...");
+                return 0;
+            }
+        };
+        proxy= (ArithmeticCalculator) Proxy.newProxyInstance(loader,intefaces,h);
+        return proxy;
+    }
+}
+```
+
+输出
+
+```
+直接调用ArithmeticCalculatorImpl类的add方法
+result:12
+调用由代理类中由Proxy的静态方法返回的ArithmeticCalculator对象的add方法
+invoke...
+result:0
+```
+
+可以看到代理类中写的invoke方法执行了。
+
+接下来使用动态代理实现数学计算器中的日志功能（在invoke方法中添加日志，日志内容可以传入方法名及参数信息，所以日志可以动态变化）
+
+```java
+InvocationHandler h=new InvocationHandler() {
+    /*
+            proxy:正在返回的那个代理对象，一般情况下，在invoke方法中都不使用该对象
+            method：正在被调用的方法
+            args：调用方法时，传入的参数
+             */
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        String methodName=method.getName();
+        // 日志
+        System.out.println("The method "+methodName+" begins with "+ Arrays.asList(args));
+        // 执行方法
+        Object result=method.invoke(target,args);
+        // 日志
+        System.out.println("The method "+methodName+" ends with "+result);
+        return result;
+    }
+};
+```
+
+输出
+
+```
+调用由代理类中由Proxy的静态方法返回的ArithmeticCalculator对象的add方法
+The method add begins with [5, 7]
+The method add ends with 12
+result:12
+```
+
+> 开发中一般不直接使用动态代理，因为实现起来比较麻烦，可以用更方便的spring的aop实现
+
 ##### 动态代理的方式 
 
 （1）基于接口实现动态代理： JDK 动态代理 
 
 （2）基于继承实现动态代理： Cglib、 Javassist 动态代理 
-
-#### 数学计算器的改进 
-
-##### 日志处理器 
-
-##### 验证处理器 
-
-##### 测试代码 
-
-##### 保存生成的动态代理类
 
 ### AOP 概述  
 
