@@ -14,7 +14,7 @@ public class Test {
         int result=calculator.add(5,7);
         System.out.println("result:"+result);
 
-        result=calculator.div(1000,0);
-        System.out.println("result:"+result);
+/*        result=calculator.div(1000,0);
+        System.out.println("result:"+result);*/
     }
 }

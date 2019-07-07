@@ -17,7 +17,7 @@ import java.util.Arrays;
 @Component
 @Aspect
 public class LoggingAspect2 {
-    @Around(value = "execution(public int aopOverview.calculator_aop.ArithmeticCalculatorImpl.*(..))")
+/*    @Around(value = "execution(public int aopOverview.calculator_aop.ArithmeticCalculatorImpl.*(..))")
     public Object aroundMethod(ProceedingJoinPoint joinPoint){
         Object result=null;
         String methodName=joinPoint.getSignature().getName();
@@ -37,5 +37,5 @@ public class LoggingAspect2 {
             System.out.println("The method "+methodName+" ends");
         }
         return result;
-    }
+    }*/
 }

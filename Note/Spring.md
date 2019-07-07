@@ -1895,6 +1895,53 @@ Exception in thread "main" java.lang.RuntimeException: java.lang.ArithmeticExcep
 
 4、其他通知可以通过方法名称引入该切入点 
 
+声明切入点表达式，并将通知的切入点都使用切入点表达式来表示
+
+```java
+    // 定义一个方法，用于声明切入点表达式，一般地，该方法中不需要再添加其他的代码
+    @Pointcut("execution(public int aopOverview.calculator_aop.ArithmeticCalculator.*(int,int))")
+    public void declareJoinPointExpression(){}
+
+    // 声明该方法是一个前置通知，在目标方法开始之前执行
+    @Before("declareJoinPointExpression()")
+    public void beforeMethod(JoinPoint joinPoint) {
+        String methodName = joinPoint.getSignature().getName();
+        List<Object> args = Arrays.asList(joinPoint.getArgs());
+        System.out.println("The method "+methodName+" begins with "+args);
+    }
+
+    // 声明该方法是一个后置通知（无论是否发生异常），在目标方法开始之后执行
+    @After("declareJoinPointExpression()")
+    public  void afterMethod(JoinPoint joinPoint){
+        String methodName = joinPoint.getSignature().getName();
+        System.out.println("The method "+methodName+" ends");
+    }
+
+    // 声明该方法是一个返回通知，返回通知是可以访问到方法的返回值的
+    @AfterReturning(value = "declareJoinPointExpression()",returning = "result")
+    public  void afterReturnMethod(JoinPoint joinPoint, Object result){
+        String methodName = joinPoint.getSignature().getName();
+        System.out.println("The method "+methodName+" ends with "+result);
+    }
+
+    // 在目标方法出现异常时会执行的代码，可以访问到异常对象，且可以指定出现特定异常时执行通知代码
+    @AfterThrowing(value = "declareJoinPointExpression()",throwing = "e")
+    public void afterThrowingMethod(JoinPoint joinPoint, NullPointerException e){
+        String methodName=joinPoint.getSignature().getName();
+        System.out.println("The method "+methodName+" occurs exception: "+e);
+    }
+```
+
+输出
+
+```
+validate: [5, 7]
+The method add begins with [5, 7]
+The method add ends
+The method add ends with 12
+result:12
+```
+
 #### 指定切面的优先级 
 
 1、在同一个连接点上应用不止一个切面时，除非明确指定，否则它们的优先级是不确定的。 
@@ -1905,11 +1952,40 @@ Exception in thread "main" java.lang.RuntimeException: java.lang.ArithmeticExcep
 
 4、若使用@Order 注解， 序号出现在注解中 
 
+验证参数的切面，@Order(1)
 
+```java
+@Order(1)
+@Component
+@Aspect
+public class ValidationAspect {
+    @Before("execution(public int aopOverview.calculator_aop.ArithmeticCalculator.*(int,int)))")
+    public void validationMethod(JoinPoint joinPoint){
+        System.out.println("validate: "+ Arrays.asList(joinPoint.getArgs()));
+    }
+}
+```
 
+添加日志的切面，@Order(2)
 
+```java
+@Order(2)
+@Aspect
+@Component
+public class LoggingAspect {...}
+```
 
+输出
 
+```
+validate: [5, 7]
+The method add begins with [5, 7]
+The method add ends
+The method add ends with 12
+result:12
+```
+
+@Order中数字小的切面在前面执行
 
 
 
