@@ -1987,5 +1987,70 @@ result:12
 
 @Order中数字小的切面在前面执行
 
+### 以 XML 方式配置切面 
 
+#### 概述 
+
+除了使用 AspectJ 注解声明切面， Spring 也支持在 bean 配置文件中声明切面。 这种声明是通过 aop 名称空间中的 XML 元素完成的。 
+
+正常情况下， 基于注解的声明要优先于基于 XML 的声明。 通过 AspectJ 注解， 切面可以与 AspectJ 兼容， 而基于 XML 的配置则是 Spring 专有的。 由于 AspectJ 得到越来越多的 AOP框架支持， 所以以注解风格编写的切面将会有更多重用的机会。 
+
+#### 配置细节 
+
+在 bean 配置文件中， 所有的 Spring AOP 配置都必须定义在<aop:config>元素内部。 对于每个切面而言， 都要创建一个<aop:aspect>元素来为具体的切面实现引用后端 bean 实例。 
+
+#### 声明切入点 
+
+1、切入点使用<aop:pointcut>元素声明。 
+
+2、切入点必须定义在<aop:aspect>元素下， 或者直接定义在<aop:config>元素下。 
+
+（1）定义在<aop:aspect>元素下： 只对当前切面有效 
+
+（2）定义在<aop:config>元素下： 对所有切面都有效 
+
+3、基于 XML 的 AOP 配置不允许在切入点表达式中用名称引用其他切入点 
+
+#### 声明通知 
+
+1、在 aop 名称空间中， 每种通知类型都对应一个特定的 XML 元素。 
+
+2、通知元素需要使用<pointcut-ref>来引用切入点， 或用<pointcut>直接嵌入切入点表达式。 
+
+3、method 属性指定切面类中通知方法的名称 
+
+使用XML配置切面
+
+```xml
+    <!--配置要实例化类的bean-->
+    <bean id="arithmeticCalculator" class="aopOverview.base_annotation.ArithmeticCalculatorImpl"></bean>
+    <!--配置切面的bean-->
+    <bean id="loggingAspect" class="aopOverview.base_annotation.LoggingAspect"></bean>
+    <bean id="validationAspect" class="aopOverview.base_annotation.ValidationAspect"></bean>
+    <!--配置aop-->
+    <aop:config>
+        <!--配置切点表达式-->
+        <aop:pointcut id="pointcut" expression="execution(public int aopOverview.base_annotation.ArithmeticCalculator.*(..))"/>
+        <!--配置切面-->
+        <aop:aspect ref="loggingAspect" order="1">
+            <aop:before method="beforeMethod" pointcut-ref="pointcut"></aop:before>
+            <aop:after method="afterMethod" pointcut-ref="pointcut"></aop:after>
+            <aop:after-returning method="afterReturnMethod" pointcut-ref="pointcut" returning="result"></aop:after-returning>
+            <aop:after-throwing method="afterThrowingMethod" pointcut-ref="pointcut" throwing="e"></aop:after-throwing>
+        </aop:aspect>
+        <aop:aspect ref="validationAspect" order="2">
+            <aop:before method="validationMethod" pointcut-ref="pointcut"></aop:before>
+        </aop:aspect>
+    </aop:config>
+```
+
+输出表现和注解方式一样
+
+```
+The method add begins with [5, 7]
+validate: [5, 7]
+The method add ends
+The method add ends with 12
+result:12
+```
 
