@@ -62,9 +62,38 @@
 
 1、新建 Web 工程， 加入 jar 包 （可以使用maven导入jar包）
 
+直接导入spring-webmvc的依赖，就可以自动将所需的所有jar包导入进来，包括spring所需的jar包
+
+```xml
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>5.1.5.RELEASE</version>
+</dependency>
+```
+
 2、在 web.xml 中配置 DispatcherServlet 
 
 通过contextConfigLocation属性指定 Spring MVC 的配置文件的位置。
+
+```xml
+    <!--配置DispatcherServlet-->
+    <servlet>
+        <servlet-name>springDispatcherServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!--配置的一个初始化参数：配置SpringMVC配置文件(springmvc.xml)的位置和名称-->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:springmvc.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>springDispatcherServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+```
 
 3、加入 Spring MVC 的配置文件： springmvc.xml 
 
@@ -76,15 +105,78 @@
 
 配置映射解析器： 如何将控制器返回的结果字符串， 转换为一个物理的视图文件 。
 
+```xml
+    <!--配置自动扫描的包：扫描handlers-->
+    <context:component-scan base-package="helloworld.handler"></context:component-scan>
+
+    <!--配置视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+```
+
 4、需要创建一个入口页面， index.jsp 
+
+```html
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+  <head>
+    <title>$Title$</title>
+  </head>
+  <body>
+  <a href="helloworld">Hello world</a>
+  </body>
+</html>
+```
 
 5、编写处理请求的处理器， 并标识为处理器 
 
-@Controller注解的类。，在Spring MVC的配置文件中被扫描。
+@Controller注解的类，在Spring MVC的配置文件中被扫描。
+
+```java
+/*
+1、使用@RequestMapping注解来映射请求的URL（在前端传过来）
+2、返回值会通过视图解析器（在springMVC配置文件中配置）为实际的物理视图，对于InternalResourceViewResolver视图解析器，会做如下解析：
+prefix+returnVal+suffix，然后做转发操作
+ */
+@Controller
+public class Helloworld {
+    @RequestMapping("/helloworld")
+    public String helloworld(){
+        System.out.println("Hello world!");
+        return "success";
+    }
+}
+```
 
 6、编写视图 
 
+web/WEB-INF/views/success.jsp
+
+```html
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+    <h4>Success!</h4>
+</body>
+</html>
+```
+
 7、部署测试 
+
+在Idea中的部署：
+
+（1）配置Tomcat Server：设置启动URL
+
+（2）Add Framework Support：添加web框架（这一步应该在创建工程后就做了，可以自动生成web.xml的骨架）；web文件夹应该有一个小蓝点标识，如果移动了web文件夹，应该在Project Structure中进行相关修改。
+
+8、启动结果
+
+点击Hello World超链接，显示success！画面。
 
 ## HelloWorld 深度解析 
 
