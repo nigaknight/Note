@@ -1706,15 +1706,184 @@ execution([权限修饰符] [返回值类型] [简单类名/全类名] [方法�
 
 前置通知： 在方法执行之前执行的通知 ，使用@Before 注解 。
 
+```java
+    // 声明该方法是一个前置通知，在目标方法开始之前执行
+    @Before("execution(public int aopOverview.calculator_aop.ArithmeticCalculator.*(int,int))")
+    public void beforeMethod(JoinPoint joinPoint) {
+        String methodName = joinPoint.getSignature().getName();
+        List<Object> args = Arrays.asList(joinPoint.getArgs());
+        System.out.println("The method "+methodName+" begins with "+args);
+    
+```
+
+输出
+
+```
+The method add begins with [5, 7]
+result:12
+The method div begins with [8, 2]
+result:4
+```
+
 ##### 后置通知 
 
 后置通知： 后置通知是在连接点完成之后执行的， 即连接点返回结果或者抛出异常的时候 ，使用@After 注解 
 
+```java
+    // 声明该方法是一个后置通知（无论是否发生异常），在目标方法开始之后执行
+	@After("execution(public int aopOverview.calculator_aop.ArithmeticCalculator.*(int,int))")
+    public  void afterMethod(JoinPoint joinPoint){
+        String methodName = joinPoint.getSignature().getName();
+        System.out.println("The method "+methodName+" ends");
+    }
+```
+
+输出
+
+```
+The method add ends
+result:12
+The method div ends
+result:4
+```
+
 ##### 返回通知 
+
+1、返回通知： 无论连接点是正常返回还是抛出异常， 后置通知都会执行。 如果只想在连接点返回的时候记录日志， 应使用返回通知代替后置通知。 
+
+2、使用@AfterReturning 注解,在返回通知中访问连接点的返回值 
+
+（1）在返回通知中， 只要将 returning 属性添加到@AfterReturning 注解中， 就可以访问连接点的返回值。 该属性的值即为用来传入返回值的参数名称 
+
+（2）必须在通知方法的签名中添加一个同名参数。 在运行时 Spring AOP 会通过这个参数传递返回值 
+
+（3）原始的切点表达式需要出现在 pointcut 属性中 
+
+添加返回通知
+
+```java
+    // 声明该方法是一个返回通知，返回通知是可以访问到方法的返回值的
+    @AfterReturning(value = "execution(public int aopOverview.calculator_aop.ArithmeticCalculator.*(int,int))",returning = "result")
+    public  void afterReturnMethod(JoinPoint joinPoint, Object result){
+        String methodName = joinPoint.getSignature().getName();
+        System.out.println("The method "+methodName+" ends with "+result);
+    }
+```
+
+输出
+
+```
+The method add begins with [5, 7]
+The method add ends
+The method add ends with 12
+result:12
+The method div begins with [8, 2]
+The method div ends
+The method div ends with 4
+result:4
+The method div begins with [1000, 0]
+The method div ends
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+```
+
+抛出异常时返回通知将不执行，但是后置通知会执行
 
 ##### 异常通知 
 
+1、异常通知： 只在连接点抛出异常时才执行异常通知 
+
+2、将 throwing 属性添加到@AfterThrowing 注解中， 也可以访问连接点抛出的异常。Throwable 是所有错误和异常类的顶级父类， 所以在异常通知方法可以捕获到任何错误和异常 
+
+3、如果只对某种特殊的异常类型感兴趣， 可以将参数声明为其他异常的参数类型。 然后通知就只在抛出这个类型及其子类的异常时才被执行 
+
+添加异常通知
+
+```java
+    // 在目标方法出现异常时会执行的代码，可以访问到异常对象，且可以指定出现特定异常时执行通知代码
+    @AfterThrowing(value = "execution(public int aopOverview.calculator_aop.ArithmeticCalculator.*(int,int))",throwing = "e")
+    public void afterThrowingMethod(JoinPoint joinPoint, Exception e){
+        String methodName=joinPoint.getSignature().getName();
+        System.out.println("The method "+methodName+" occurs exception: "+e);
+    }
+```
+
+输出
+
+```
+The method div begins with [1000, 0]
+The method div ends
+The method div occurs exception: java.lang.ArithmeticException: / by zero
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+```
+
+在异常通知中指定特定异常
+
+```java
+public void afterThrowingMethod(JoinPoint joinPoint, NullPointerException e)
+```
+
+输出
+
+```
+The method div begins with [1000, 0]
+The method div ends
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+```
+
+由于抛出的是算术异常，而指定的是空指针异常，所以异常通知不会执行。
+
 ##### 环绕通知 
+
+1、环绕通知是所有通知类型中功能最为强大的， 能够全面地控制连接点， 甚至可以控制是否执行连接点。 
+
+2、对于环绕通知来说， 连接点的参数类型必须是 ProceedingJoinPoint。 它是 JoinPoint 的子接口， 允许控制何时执行， 是否执行连接点。 
+
+3、在环绕通知中需要明确调用 ProceedingJoinPoint 的 proceed()方法来执行被代理的方法。如果忘记这样做就会导致通知被执行了， 但目标方法没有被执行 
+
+4、注意： 环绕通知的方法需要返回目标方法执行之后的结果， 即调用 joinPoint.proceed();的返回值， 否则会出现空指针异常。 
+
+添加环绕通知
+
+```java
+@Component
+@Aspect
+public class LoggingAspect2 {
+    @Around(value = "execution(public int aopOverview.calculator_aop.ArithmeticCalculatorImpl.*(..))")
+    public Object aroundMethod(ProceedingJoinPoint joinPoint){
+        Object result=null;
+        String methodName=joinPoint.getSignature().getName();
+
+        try {
+            // 前置通知
+            System.out.println("The method "+ methodName+" begins with "+ Arrays.asList(joinPoint.getArgs()));
+            result= joinPoint.proceed();
+            // 返回通知
+            System.out.println("The method "+methodName+" ends with "+result);
+        } catch (Throwable throwable) {
+            // 异常通知
+            System.out.println("The method "+methodName+" occurs exception: "+throwable);
+            throw new RuntimeException(throwable);
+        }finally {
+            // 后置通知
+            System.out.println("The method "+methodName+" ends");
+        }
+        return result;
+    }
+}
+```
+
+输出
+
+```
+The method add begins with [5, 7]
+The method add ends with 12
+The method add ends
+result:12
+The method div begins with [1000, 0]
+The method div occurs exception: java.lang.ArithmeticException: / by zero
+The method div ends
+Exception in thread "main" java.lang.RuntimeException: java.lang.ArithmeticException: / by zero
+```
 
 #### 重用切入点定义 
 
