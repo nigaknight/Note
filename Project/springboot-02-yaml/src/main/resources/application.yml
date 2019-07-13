@@ -1,0 +1,8 @@
+person:
+    name: dzq
+    age: 27
+    boss: false
+    map: {k1: 1,k2: 15}
+    dog:
+      name: dog
+      age: 12
