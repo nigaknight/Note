@@ -490,8 +490,8 @@ name:   ‘zhangsan \n lisi’：输出；zhangsan \n  lisi
 
 ```yaml
 friends:
-		lastName: zhangsan
-		age: 20
+    lastName: zhangsan
+    age: 20
 ```
 
 行内写法：
@@ -518,6 +518,8 @@ pets: [cat,dog,pig]
 ```
 
 ## 配置文件值注入
+
+### Yaml配置注入
 
 配置文件
 
@@ -607,6 +609,259 @@ public class Springboot02YamlApplicationTests {
 
 ```
 Person{name='dzq', age=27, boss=false, map={k1=1, k2=15}, dog=Dog{name='dog', age=12}}
+```
+
+### Properties配置注入
+
+配置文件
+
+```properties
+person.name=邓紫棋
+person.age=27
+person.boss=false
+person.map.k1=1
+person.map.k2=12
+person.dog.name=玛丽
+person.dog.age=12
+```
+
+properties配置文件在idea中可能会中文会出现乱码（如以下输出）
+
+```
+Person{name='éç´«æ£', age=27, boss=false, map={k1=1, k2=12}, dog=Dog{name='çä¸½', age=12}}
+```
+
+在settings/file encodings中修改encoding for properties file为utf-8，并勾上transparent native-to-ascii conversion；然后将乱码的properties文件中的中文重新输入；
+
+```
+Person{name='邓紫棋', age=27, boss=false, map={k1=1, k2=12}, dog=Dog{name='玛丽', age=12}}
+```
+
+就不出现乱码了（还是yaml比较方便）
+
+### @Value获取配置
+
+对比@ConfigurationProperties
+
+|                      | @ConfigurationProperties | @Value     |
+| -------------------- | ------------------------ | ---------- |
+| 功能                 | 批量注入配置文件中的属性 | 一个个指定 |
+| 松散绑定（松散语法） | 支持                     | 不支持     |
+| SpEL                 | 不支持                   | 支持       |
+| JSR303数据校验       | 支持                     | 不支持     |
+| 复杂类型封装         | 支持                     | 不支持     |
+
+1、@Value需要一个个指定，且支持SpEL
+
+```java
+@Component
+// @ConfigurationProperties(prefix = "person")
+public class Person {
+    @Value("${person.name}")
+    private String name;
+    // SpEL，@ConfigureationProperties不支持
+    @Value("#{11*2}")
+    private int age;
+    @Value(("true"))
+    private boolean boss;
+    private Map<String,Integer> map;
+    private Dog dog;
+}
+```
+
+测试输出
+
+```
+Person{name='邓紫棋', age=22, boss=true, map=null, dog=null}
+```
+
+2、松散绑定
+
+比如javabean中的lastName属性，在yaml文件中配置为last-name=zhangsan，那么使用@ConfigureationProperties注解是可以注入进来的；而使用@Value("${person.lastName}")则会出错，必须是@Value("${person.last-name}")
+
+3、数据校验
+
+```java
+@Component
+@ConfigurationProperties(prefix = "person")
+// 数据校验的注解
+@Validated
+public class Person {
+    // @Value("${person.name}")
+    // 这个注解的意思是下面的值必须填充邮箱格式
+    @Email
+    private String name;
+    // @Value("#{11*2}")
+    private int age;
+    // @Value(("true"))
+    private boolean boss;
+    private Map<String,Integer> map;
+    private Dog dog;
+}    
+```
+
+启动单元测试后会报错，输出异常信息如下
+
+```
+    Property: person.name
+    Value: 邓紫棋
+    Origin: class path resource [application.properties]:1:13
+    Reason: 不是一个合法的电子邮件地址
+```
+
+4、复杂类型封装
+
+@Value不支持map等类型的值的注入
+
+```java
+    @Value("${person.map}")
+    private Map<String,Integer> map;
+```
+
+启动单元测试后会报错
+
+5、如何选用@Value和@ConfigureationProperties
+
+（1）如果说，我们只是在某个业务逻辑中需要获取一下配置文件中的某项值，使用@Value；
+
+创建一个controller层，返回的字符串包含一个配置中的属性值person.name，就可以用@Value注入进来
+
+```java
+@RestController
+public class HelloController {
+    @Value("${person.name}")
+    private String name;
+    @RequestMapping("/hello")
+    public String hello(){
+        return "hello"+name;
+    }
+}
+```
+
+启动项目，浏览器访问结果如下
+
+```
+hello邓紫棋
+```
+
+（2）如果说，我们专门编写了一个javaBean来和配置文件进行映射，我们就直接使@ConfigurationProperties；
+
+### @PropertySource获取配置
+
+1、如果所有的配置都写在全局配置文件application.properties中，可读性比较差，所以可以将配置文件分开，使用@PropertySource获取配置。
+
+创建一个配置文件person.properties
+
+```
+person.name=周杰伦
+person.age=27
+person.boss=false
+person.map.k1=1
+person.map.k2=12
+person.dog.name=杰克
+person.dog.age=12
+```
+
+2、添加@PropertySource获取配置
+
+必须和@ConfigurationProperties一起使用
+
+```java
+@ConfigurationProperties(prefix = "person")
+@PropertySource(value = "classpath:person.properties")
+public class Person {
+```
+
+启动单元测试后输出
+
+```
+Person{name='周杰伦', age=27, boss=false, map={k1=1, k2=12}, dog=Dog{name='杰克', age=12}}
+```
+
+### @ImportResource导入xml配置
+
+1、导入Spring的配置文件（比如配置bean的xml文件），让配置文件里面的内容生效；
+
+2、Spring Boot里面没有Spring的配置文件，我们自己编写的配置文件，也不能自动识别；想让Spring的配置文件生效，加载进来，需要将@ImportResource标注在一个配置类上
+
+3、在springboot中使用配置文件
+
+javabean
+
+```java
+public class HelloService {
+}
+```
+
+xml配置
+
+```xml
+<bean id="helloworld" class="com.wjy.springboot02yaml.service.HelloService"></bean>
+```
+
+单元测试
+
+```java
+    @Autowired
+    ApplicationContext ioc;
+
+    @Test
+    public void testHelloService(){
+        boolean b = ioc.containsBean("helloworld");
+        System.out.println(b);
+    }
+```
+
+输出
+
+```
+false
+```
+
+说明我们配置的bean没有起作用，ioc容器中没有helloworld这个bean。
+
+4、添加@ImportResource注解
+
+在主程序中添加@ImportResource注解，将配置文件导入进来
+
+```java
+@SpringBootApplication
+@ImportResource(locations = {"classpath:beans.xml"})
+public class Springboot02YamlApplication {
+```
+
+再启动单元测试，输出
+
+```
+true
+```
+
+使用xml文件配置bean不常用，一般用全注解。
+
+### 全注解添加组件
+
+1、SpringBoot推荐给容器中添加组件的方式：推荐使用全注解的方式；
+
+2、配置类@Configuration相当于Spring配置文件
+
+```java
+@Configuration
+public class MyAppConfig {
+
+    // 将方法中的返回值添加到容器中，容器中这个组件默认的id就是方法名
+    @Bean
+    public HelloService helloworld(){
+        System.out.println("配置类@Bean给容器中添加组件了...");
+        return new HelloService();
+    }
+}
+```
+
+3、启动单元测试，输出
+
+```
+配置类@Bean给容器中添加组件了...
+true
 ```
 
 ## Profile
