@@ -1217,3 +1217,107 @@ logging.pattern.file=%d{yyyy-MM-dd} === [%thread] === %-5level === %logger{50} =
 ### 指定配置
 
 ## 切换日志框架
+
+# SpringBoot Web开发
+
+## 简介
+
+1、使用SpringBoot进行开发的步骤
+
+（1）创建SpringBoot应用，选中我们需要的模块；
+
+（2）SpringBoot已经默认将这些场景配置好了，只需要在配置文件中指定少量配置就可以运行起来
+
+（3）自己编写业务代码；
+
+2、自动配置原理
+
+了解了自动配置原理，就能知道所选的场景下SpringBoot帮助我们配置了哪些内容，可以修改哪些配置以及如何对配置进行扩展。
+
+在spring-boot-autoconfigure的包下有着所有场景下的配置内容。
+
+```
+xxxxAutoConfiguration：帮我们给容器中自动配置组件；
+xxxxProperties:配置类来封装配置文件的内容；
+```
+
+3、我们使用一个Restful风格的CRUD（增删改查）例子来学习springboot 的web开发。
+
+## 静态资源映射规则
+
+1、公共静态资源存放的位置
+
+（1）在springboot的配置中，规定请求url为 /webjars/**时 ，都去 classpath:/META-INF/resources/webjars/ 找资源；
+
+（2）webjars：以jar包的方式引入静态资源；在http://www.webjars.org/ 网站下可以找到一些公共静态资源的jar包；可以将我们需要的静态资源的jar包的maven坐标放到pom文件下，webjars就会自动导入进来。
+
+```xml
+        <!--jquery静态资源的webjars包-->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>3.4.1</version>
+        </dependency>
+    </dependencies>
+```
+
+（3）访问js资源的url `localhost:8080/webjars/jquery/3.4.1/jquery.js`；
+
+2、自己的静态资源存放的位置
+
+（1）"/**" 访问当前项目的任何资源，都去（静态资源的文件夹）找映射
+
+（2）按以下优先级访问当前项目的静态资源，其中classpath就是项目中的resources文件夹
+
+```
+"classpath:/META-INF/resources/", 
+"classpath:/resources/",
+"classpath:/static/", 
+"classpath:/public/" 
+"/"：当前项目的根路径
+```
+
+这些默认配置在ResourceProperties.java文件夹下
+
+```java
+public class ResourceProperties {
+
+	private static final String[] CLASSPATH_RESOURCE_LOCATIONS = { "classpath:/META-INF/resources/",
+			"classpath:/resources/", "classpath:/static/", "classpath:/public/" };
+```
+
+（3）将自己的静态资源放到resources(classpath)下的resources文件夹中，然后就可以使用url进行访问了，例如
+
+`http://localhost:8080/asserts/js/Chart.min.js`
+
+3、欢迎页
+
+（1）静态资源文件夹下的index.html页面会被被"/**"映射；（首页名字必须是index.html）
+
+（2）直接访问localhost:8080/  ，就会在resources下找到index页面，进行显示；
+
+4、网页图标
+
+所有的 **/favicon.ico  都是在静态资源文件下找；（图标名字必须是favicon.ico）
+
+5、自己配置资源文件夹
+
+这时候静态资源应该放在指定的文件夹下
+
+```properties
+spring.resources.static-locations=classpath:/hello/,classpath:/wjy/
+```
+
+## 模板引擎
+
+## SpringMVC自动配置
+
+## 修改默认配置
+
+## RestfulCRUD
+
+## 错误处理机制
+
+## 嵌入式Servlet容器
+
+## 外置的Servlet容器
