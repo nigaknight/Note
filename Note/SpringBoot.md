@@ -982,6 +982,238 @@ java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --spring.config.location=G
 
 （此时G盘有一个application.properties配置文件）
 
+通过这种方式，在项目已经打包完成以后，运维可以根据需要自己编写一个配置文件，增加所需要的配置；
+
 ## 外部配置加载顺序
 
 ## 自动配置原理
+
+# SpringBoot日志
+
+## 日志框架
+
+1、 小张需要开发一个大型系统
+
+（1）代码里包含有很多System.out.println("")，来将关键数据打印在控制台；应该将这些打印去掉？还是写在一个文件里面？
+
+（2）框架来记录系统的一些运行时信息；日志框架 ；  zhanglogging.jar；
+
+（3）高大上的几个功能？异步模式？自动归档？xxxx？  zhanglogging-good.jar？
+
+（4）将以前框架卸下来？换上新的框架，重新修改之前相关的API；zhanglogging-prefect.jar；
+
+（5）JDBC---数据库驱动；写了一个统一的接口层，即日志门面（日志的一个抽象层）；logging-abstract.jar；
+
+之后我们只要给项目中导入具体的日志实现就行了；我们之前的日志框架都是实现的抽象层；
+
+2、市面上的日志框架
+
+JUL、JCL、Jboss-logging、logback、log4j、log4j2、slf4j....
+
+| 日志门面  （日志的抽象层）                                   | 日志实现                                         |
+| ------------------------------------------------------------ | ------------------------------------------------ |
+| JCL（Jakarta  Commons Logging）   SLF4j（Simple  Logging Facade for Java）    jboss-logging | Log4j  JUL（java.util.logging）  Log4j2  Logback |
+
+我们左边选一个门面（抽象层）、右边来选一个实现；
+
+日志门面：  SLF4J；
+
+日志实现：Logback；
+
+3、SpringBoot的日志框架
+
+底层是Spring框架，Spring框架默认是用JCL；而SpringBoot选用 SLF4j和logback；
+
+## 抽象层SLF4j使用
+
+### 如何使用SLF4j
+
+1、以后开发的时候，日志记录方法的调用，不应该来直接调用日志的实现类，而是调用日志抽象层里面的方法；
+
+2、给系统里面导入slf4j的jar和 logback的实现jar包；
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class HelloWorld {
+  public static void main(String[] args) {
+    Logger logger = LoggerFactory.getLogger(HelloWorld.class);
+    logger.info("Hello World");
+  }
+}
+```
+
+3、对于比较老的实现层，没有考虑到SLF4J这个抽象层，我们需要添加一个适配层来将抽象层和实现层联系起来。
+
+比如slf4j-log4j2.jar适配层；
+
+4、每一个日志的实现框架都有自己的配置文件。使用slf4j以后，配置文件还是做成日志实现框架自己本身的配置文件。
+
+![日志框架](https://i.ibb.co/4pfB4b3/image.png)
+
+### 遗留问题
+
+1、我们开发的系统使用的是（slf4j+logback）
+
+但是这个系统是基于其他系统开发的，其他系统用了其他的框架：Spring（commons-logging）、Hibernate（jboss-logging）、MyBatis、xxxx
+
+2、所以应该如何统一日志记录呢？如何使别的框架和我一起统一使用slf4j进行输出？
+
+（1）将系统中其他日志框架先排除出去；
+
+（2）用中间包来替换原有的日志框架；
+
+（3）我们导入slf4j其他的实现。
+
+![遗留问题](https://i.ibb.co/M1XgMPs/image.png)
+
+## SpringBoot日志关系
+
+1、SpringBoot日志的依赖关系
+
+```xml
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+```
+
+SpringBoot使用它来做日志功能；
+
+```xml
+	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-logging</artifactId>
+		</dependency>
+```
+
+底层依赖关系
+
+![日志依赖关系](https://i.ibb.co/Yy21XYp/image.png)
+
+2、SpringBoot底层是使用slf4j+logback的方式进行日志记录
+
+3、SpringBoot也把其他的日志都替换成了slf4j，替换包中实际使用的是SLF4J的类；
+
+```java
+@SuppressWarnings("rawtypes")
+public abstract class LogFactory {
+
+    static String UNSUPPORTED_OPERATION_IN_JCL_OVER_SLF4J = "http://www.slf4j.org/codes.html#unsupported_operation_in_jcl_over_slf4j";
+
+    static LogFactory logFactory = new SLF4JLogFactoy();
+```
+
+4、如果我们要引入其他框架，一定要把这个框架的默认日志依赖移除掉。
+
+比如Spring框架用的是commons-logging，在springboot引入spring-core依赖时就将commons-logging排除了；
+
+```xml
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+```
+
+5、pringBoot能自动适配所有的日志，而且底层使用slf4j+logback的方式记录日志，引入其他框架的时候，只需要把这个框架依赖的日志框架排除掉即可。
+
+## 日志使用
+
+### 默认配置
+
+1、SpringBoot实际上已经默认帮我们配置好了日志，所以直接启动主程序就有日志在控制台中输出；
+
+2、springboot默认输出info级别及以上的日志
+
+```java
+    // 记录器
+    Logger logger= LoggerFactory.getLogger(getClass());
+    @Test
+    public void contextLoads() {
+        //日志的级别；
+        //由低到高   trace<debug<info<warn<error
+        //可以调整输出的日志级别；日志就只会在这个级别以以后的高级别生效
+        logger.trace("这是trace日志...");
+        logger.debug("这是debug日志...");
+        // SpringBoot默认给我们使用的是info级别的，没有指定级别的就用SpringBoot默认规定的级别；root级别
+        logger.info("这是info日志...");
+        logger.warn("这是warn日志...");
+        logger.error("这是error日志...");
+    }
+```
+
+打印日志
+
+```
+2019-07-14 14:08:32.230  INFO 13364 --- [           main] .w.s.Springboot03LoggingApplicationTests : 这是info日志...
+2019-07-14 14:08:32.230  WARN 13364 --- [           main] .w.s.Springboot03LoggingApplicationTests : 这是warn日志...
+2019-07-14 14:08:32.230 ERROR 13364 --- [           main] .w.s.Springboot03LoggingApplicationTests : 这是error日志...
+```
+
+4、SpringBoot修改日志的默认配置
+
+（1）在配置文件application.properties中添加日志显示级别的设置
+
+```properties
+logging.level.com.wjy=trace
+```
+
+输出日志
+
+```
+2019-07-14 14:12:16.207 TRACE 10968 --- [           main] .w.s.Springboot03LoggingApplicationTests : 这是trace日志...
+2019-07-14 14:12:16.207 DEBUG 10968 --- [           main] .w.s.Springboot03LoggingApplicationTests : 这是debug日志...
+2019-07-14 14:12:16.207  INFO 10968 --- [           main] .w.s.Springboot03LoggingApplicationTests : 这是info日志...
+2019-07-14 14:12:16.207  WARN 10968 --- [           main] .w.s.Springboot03LoggingApplicationTests : 这是warn日志...
+2019-07-14 14:12:16.208 ERROR 10968 --- [           main] .w.s.Springboot03LoggingApplicationTests : 这是error日志...
+```
+
+（2）将日志保存到文件中
+
+```properties
+#logging.path=
+# 不指定路径在当前项目下生成springboot.log日志
+# 可以指定完整的路径；
+#logging.file=G:/springboot.log
+
+# 在当前磁盘的根路径下创建spring文件夹和里面的log文件夹；使用 spring.log 作为默认文件
+logging.path=/spring/log
+```
+
+| logging.file | logging.path | Example  | Description                        |
+| ------------ | ------------ | -------- | ---------------------------------- |
+| (none)       | (none)       |          | 只在控制台输出                     |
+| 指定文件名   | (none)       | my.log   | 输出日志到my.log文件               |
+| (none)       | 指定目录     | /var/log | 输出到指定目录的 spring.log 文件中 |
+
+（3）日志输出格式
+
+```
+    日志输出格式：
+		%d表示日期时间，
+		%thread表示线程名，
+		%-5level：级别从左显示5个字符宽度
+		%logger{50} 表示logger名字最长50个字符，否则按照句点分割。 
+		%msg：日志消息，
+		%n是换行符
+    -->
+    %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n
+```
+
+```properties
+#  在控制台输出的日志的格式
+logging.pattern.console=%d{yyyy-MM-dd} [%thread] %-5level %logger{50} - %msg%n
+# 指定文件中日志输出的格式
+logging.pattern.file=%d{yyyy-MM-dd} === [%thread] === %-5level === %logger{50} ==== %msg%n
+```
+
+### 指定配置
+
+## 切换日志框架
