@@ -6,4 +6,12 @@ package com.wjy.springboot02yaml.service;
 */
 
 public class HelloService {
+    private String s;
+
+    @Override
+    public String toString() {
+        return "HelloService{" +
+                "s='" + s + '\'' +
+                '}';
+    }
 }

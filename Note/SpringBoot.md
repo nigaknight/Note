@@ -864,9 +864,123 @@ public class MyAppConfig {
 true
 ```
 
-## Profile
+### 配置文件占位符
+
+1、随机数
+
+```
+${random.value}、${random.int}、${random.long}
+${random.int(10)}、${random.int[1024,65536]}
+```
+
+2、配置文件占位符的使用
+
+占位符获取之前配置的值，如果没有可以是用来指定默认值
+
+```properties
+person.name=邓紫棋${random.uuid}
+person.age=${random.int}
+person.boss=false
+person.map.k1=1
+person.map.k2=12
+person.dog.name=${person.name}_${person.hello}玛丽
+person.dog.age=12
+```
+
+输出
+
+```
+Person{name='邓紫棋8304b094-5501-4eb6-a15c-ff8365c9c45a', age=-576686214, boss=false, map={k1=1, k2=12}, dog=Dog{name='邓紫棋c28eeb6e-6762-40fe-8c05-b8d1876af299_${person.hello}玛丽', age=12}}
+```
+
+如果person确实有hello这个属性，那么如果这个属性之前没有赋值，引用${person.hello}将会出错；如果person没有这个属性，那么就直接表示为${person.hello}
+
+## Profile切换环境
+
+### 多Profile文件
+
+1、默认使用主配置文件application.properties的配置；
+
+2、我们在配置文件编写的时候，文件名可以是   application-{profile}.properties/yml，其中profile可以任意
+
+3、在主配置文件中指定  spring.profiles.active={profile}
+
+```
+application.properties 定义server.port=8080
+application-dev.properties 定义server.port=8081
+application-prod.properties 定义server.port=8082
+```
+
+启动主程序后，使用主配置文件，端口号为8080。
+
+4、指定其他配置文件生效
+
+```properties
+server.port=8080
+spring.profiles.active=dev
+```
+
+启动主程序后，使用application-dev.properties，端口号为8081
+
+### yml多文档块方式
+
+不用分多个配置文件，直接使用---将文件分成多个文档块，每个文档块可以进行单独的配置定义，并在第一个文档块中定义要激活的配置。
+
+```yaml
+
+server:
+  port: 8081
+spring:
+  profiles:
+    active: prod
+
+---
+server:
+  port: 8083
+spring:
+  profiles: dev
+
+
+---
+
+server:
+  port: 8084
+spring:
+  profiles: prod  #指定属于哪个环境
+```
+
+### 其他环境激活方式
+
+1、命令行指定
+
+（1）在Run Configurations里面的Program arguments中添加命令行 --spring.profiles.active=dev；就可以将配置环境切换到dev环境；
+
+（2）对于工程打成的jar包，java -jar spring-boot-02-config-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev；可以直接在测试的时候，配置传入命令行参数。
+
+2、虚拟机参数
+
+在Run Configurations里面的Program arguments中添加指令 -Dspring.profiles.active=dev
 
 ## 配置文件加载位置
+
+1、springboot 启动会扫描以下位置的application.properties或者application.yml文件作为Spring boot的默认配置文件
+
+- –file:./config/（当前文件根目录）
+- –file:./
+- –classpath:/config/ （resources目录下-classpath）
+- –classpath:/
+
+2、优先级由高到底，高优先级的配置会覆盖低优先级的配置；
+
+3、SpringBoot会从这四个位置全部加载主配置文件，形成互补配置；即多个配置文件都有的配置用高优先级，高优先级的没有的配置用低优先级。
+
+4、我们还可以通过spring.config.location来改变默认的配置文件位置
+
+项目打包好以后，我们可以使用命令行参数的形式，启动项目的时候来指定配置文件的新位置；指定配置文件和默认加载的这些配置文件共同起作用形成互补配置；
+
+java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --spring.config.location=G:/application.properties
+
+（此时G盘有一个application.properties配置文件）
 
 ## 外部配置加载顺序
 

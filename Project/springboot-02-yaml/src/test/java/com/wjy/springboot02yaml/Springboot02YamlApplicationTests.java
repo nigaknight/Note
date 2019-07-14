@@ -1,6 +1,7 @@
 package com.wjy.springboot02yaml;
 
 import com.wjy.springboot02yaml.bean.Person;
+import com.wjy.springboot02yaml.service.HelloService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +19,21 @@ public class Springboot02YamlApplicationTests {
     @Autowired
     ApplicationContext ioc;
 
-    @Test
+    @Autowired
+    HelloService helloService;
+
+/*    @Test
     public void testHelloService(){
         boolean b = ioc.containsBean("helloworld");
         System.out.println(b);
-    }
+    }*/
 
     @Test
     public void contextLoads() {
         System.out.println(person);
+/*        System.out.println(helloService);
+        HelloService helloworld = (HelloService) ioc.getBean("helloworld");
+        System.out.println(helloworld);*/
     }
 
 }
