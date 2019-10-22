@@ -6,16 +6,16 @@ package leetcode35;
  **/
 public class Solution {
     public int searchInsert(int[] nums, int target) {
-        int l=0;
-        int r=nums.length-1;
-        while (l<=r){
-            int m=l+(r-l)/2;
-            if (nums[m]>target){
-                r=m-1;
-            } else if (nums[m]<target){
-                l=m+1;
-            } else {
+        int l = 0;
+        int r = nums.length - 1;
+        while (l <= r){
+            int m = l + (r - l)/2;
+            if (target == nums[m]){
                 return m;
+            } else if (target > nums[m]){
+                l = m + 1;
+            } else {
+                r = m -1;
             }
         }
         return l;

@@ -36,21 +36,27 @@ package leetcode98;
  **/
 public class Solution {
     public boolean isValidBST(TreeNode root) {
-        if (root==null){
+        if (root == null){
             return true;
         }
-        boolean res=(root.left == null ||root.val>maxBST(root.left))&&(root.right == null ||root.val<minBST(root.right));
-        return res&&isValidBST(root.left)&&isValidBST(root.right);
+        boolean res = true;
+        if (root.right != null){
+            res = root.val < min(root.right);
+        }
+        if (root.left != null){
+            res = res && (root.val > max(root.left));
+        }
+        return res && isValidBST(root.left) && isValidBST(root.right);
     }
-    public int maxBST(TreeNode root){
-        while (root.right!=null){
-            root=root.right;
+    private int max(TreeNode root){
+        while (root.right != null){
+            root = root.right;
         }
         return root.val;
     }
-    public int minBST(TreeNode root){
-        while (root.left!=null){
-            root=root.left;
+    private int min(TreeNode root){
+        while (root.left != null){
+            root = root.left;
         }
         return root.val;
     }

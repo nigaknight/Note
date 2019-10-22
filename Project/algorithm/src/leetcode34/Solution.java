@@ -4,6 +4,7 @@ package leetcode34;
  * @author nigaknight
  * @time 2019/10/20
  * 二分查找边界比较难把握，但是如果要找边界值，应该用l<r，而不是l<=r
+ * 不管怎么样，l=m和r=m+1是不变的
  **/
 public class Solution {
     public int[] searchRange(int[] nums, int target) {
@@ -46,6 +47,6 @@ public class Solution {
                 r = m;
             }
         }
-        return found ? l-1 : -1;
+        return found ? l - 1 : -1;
     }
 }
